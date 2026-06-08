@@ -26,6 +26,7 @@ set(GLFW_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 # Load library paths
 add_subdirectory("lib/glfw-3.4")
+add_subdirectory("lib/GLM")
 
 find_package(Vulkan REQUIRED)
 
@@ -36,7 +37,7 @@ add_executable(VulkanSandbox ${MY_SOURCES})
 target_include_directories(VulkanSandbox PRIVATE src)
 
 # Link libraries
-target_link_libraries(VulkanSandbox PRIVATE glfw Vulkan::Vulkan)
+target_link_libraries(VulkanSandbox PRIVATE glfw Vulkan::Vulkan glm)
 
 # Enable compiler warnings
 if(MSVC)
