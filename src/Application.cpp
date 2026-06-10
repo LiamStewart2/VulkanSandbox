@@ -14,7 +14,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
     }
     else
     {
-        std::cerr << "Validation Layer: " << pCallbackData->pMessage << std::endl;
+        std::cerr << "\033[35mValidation Layer: " << pCallbackData->pMessage << "\033[0m" << std::endl;
     }
     return VK_FALSE;
 }
