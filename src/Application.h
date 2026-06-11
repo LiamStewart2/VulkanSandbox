@@ -7,9 +7,15 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <vector>
+#include <map>
+#include <optional>
 
-#include <GLFW/glfw3.h>
 #include <GLM/glm.hpp>
+
+struct QueueFamilyIndices {
+    std::optional<uint32_t> m_GraphicsFamily;
+    bool IsComplete() {return m_GraphicsFamily.has_value(); }
+};
 
 class Application
 {
@@ -24,13 +30,23 @@ private:
     void InitWindow();
     void InitVulkan();
     
+    /* Initializing Vulkan */
+
     void CreateInstance();
+    void CreateLogicalDevice();
 
-
+    // Validation Layer
     bool CheckValidationLayerSupport();
     std::vector<const char*> GetRequiredExtensions();
     void PopulateDebugMessagerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     void SetupDebugMessenger();
+
+    // Devices
+    void PickPhysicalDevices();
+    bool IsDeviceSuitable(VkPhysicalDevice device);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
+
+
 
     void HandleEvents();
     void Update();
@@ -42,6 +58,9 @@ private:
 private:
     GLFWwindow* m_Window;
     VkInstance m_Instance;
+    VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice m_Device;
+    VkQueue m_GraphicsQueue;
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
