@@ -9,12 +9,17 @@
 #include <vector>
 #include <map>
 #include <optional>
+#include <set>
 
 #include <GLM/glm.hpp>
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> m_GraphicsFamily;
-    bool IsComplete() {return m_GraphicsFamily.has_value(); }
+    std::optional<uint32_t> m_PresentFamily;
+    bool IsComplete() 
+    {
+        return m_GraphicsFamily.has_value() && m_PresentFamily.has_value(); 
+    }
 };
 
 class Application
@@ -46,6 +51,9 @@ private:
     bool IsDeviceSuitable(VkPhysicalDevice device);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
+    // Surface
+    void CreateSurface();
+
 
 
     void HandleEvents();
@@ -61,6 +69,9 @@ private:
     VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
     VkDevice m_Device;
     VkQueue m_GraphicsQueue;
+    VkQueue m_PresentQueue;
+    VkSurfaceKHR m_Surface;
+
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
@@ -72,6 +83,7 @@ private:
         const bool enableValidationLayers = true;
     #endif
     VkDebugUtilsMessengerEXT m_DebugMessenger;
+
 
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
