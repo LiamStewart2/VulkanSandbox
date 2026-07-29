@@ -12,6 +12,7 @@
 #include <set>
 #include <limits>
 #include <algorithm>
+#include <fstream>
 
 #include <GLM/glm.hpp>
 
@@ -73,6 +74,8 @@ private:
 
     // Graphics Pipeline
     void CreateGraphicsPipeline();
+    void CreateRenderPass();
+    VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
     void HandleEvents();
     void Update();
@@ -94,6 +97,8 @@ private:
     VkFormat m_SwapChainImageFormat;
     VkExtent2D m_SwapChainExtent;
     std::vector<VkImageView> m_SwapChainImageViews;
+    VkPipelineLayout m_PipelineLayout;
+    VkRenderPass m_RenderPass;
 
 
     // Handle validation layers
