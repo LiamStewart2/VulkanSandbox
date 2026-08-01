@@ -77,6 +77,14 @@ private:
     void CreateRenderPass();
     VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
+    // Framebuffers
+    void CreateFramebuffers();
+
+    // Commands
+    void CreateCommandPool();
+    void CreateCommandBuffer();
+    void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
     void HandleEvents();
     void Update();
     void Render();
@@ -98,7 +106,11 @@ private:
     VkExtent2D m_SwapChainExtent;
     std::vector<VkImageView> m_SwapChainImageViews;
     VkPipelineLayout m_PipelineLayout;
+    VkPipeline m_GraphicsPipeline;
     VkRenderPass m_RenderPass;
+    std::vector<VkFramebuffer> m_SwapChainFramebuffers;
+    VkCommandPool m_CommandPool;
+    VkCommandBuffer m_CommandBuffer;
 
 
     // Handle validation layers
