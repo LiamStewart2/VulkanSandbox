@@ -85,6 +85,9 @@ private:
     void CreateCommandBuffer();
     void RecordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
+    // Sync
+    void CreateSyncObjects();
+
     void HandleEvents();
     void Update();
     void Render();
@@ -111,6 +114,9 @@ private:
     std::vector<VkFramebuffer> m_SwapChainFramebuffers;
     VkCommandPool m_CommandPool;
     VkCommandBuffer m_CommandBuffer;
+    VkSemaphore m_ImageAvailableSemaphore;
+    VkSemaphore m_RenderFinishedSemaphore;
+    VkFence m_InFlightFence;
 
 
     // Handle validation layers
