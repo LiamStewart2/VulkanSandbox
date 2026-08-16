@@ -94,6 +94,10 @@ private:
     // Sync
     void CreateSyncObjects();
 
+    // Vertex objects
+    void CreateVertexBuffer();
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
     void HandleEvents();
     void Update();
     void Render();
@@ -125,6 +129,8 @@ private:
     std::vector<VkFence> m_InFlightFences;
     bool m_FramebufferResized = false;
     uint32_t m_CurrentFrame = 0;
+    VkBuffer m_VertexBuffer;
+    VkDeviceMemory m_VertexBufferMemory;
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
@@ -148,7 +154,7 @@ private:
 
     const uint8_t MAX_FRAMES_IN_FLIGHT = 3;
 
-    const std::vector<Vertex> vertices =
+    const std::vector<Vertex> m_Vertices =
     {
         {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
         {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
