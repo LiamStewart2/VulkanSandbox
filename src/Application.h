@@ -16,6 +16,8 @@
 
 #include <GLM/glm.hpp>
 
+#include "Vertex.h"
+
 struct QueueFamilyIndices {
     std::optional<uint32_t> m_GraphicsFamily;
     std::optional<uint32_t> m_PresentFamily;
@@ -145,4 +147,11 @@ private:
     const uint32_t HEIGHT = 600;
 
     const uint8_t MAX_FRAMES_IN_FLIGHT = 3;
+
+    const std::vector<Vertex> vertices =
+    {
+        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    };
 };
