@@ -96,6 +96,7 @@ private:
 
     // Vertex objects
     void CreateVertexBuffer();
+    void CreateIndexBuffer();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
@@ -133,6 +134,8 @@ private:
     uint32_t m_CurrentFrame = 0;
     VkBuffer m_VertexBuffer;
     VkDeviceMemory m_VertexBufferMemory;
+    VkBuffer m_IndexBuffer;
+    VkDeviceMemory m_IndexBufferMemory;
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
@@ -158,8 +161,13 @@ private:
 
     const std::vector<Vertex> m_Vertices =
     {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    };
+
+    const std::vector<uint32_t> m_Indices = {
+        0, 1, 2, 2, 3, 0
     };
 };
