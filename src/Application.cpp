@@ -124,11 +124,13 @@ void Application::InitVulkan()
     CreateSwapChain();
     CreateImageViews();
     CreateRenderPass();
+    CreateDescriptorSetLayout();
     CreateGraphicsPipeline();
     CreateFramebuffers();
     CreateCommandPool();
     CreateVertexBuffer();
     CreateIndexBuffer();
+    CreateUniformBuffers();
     CreateCommandBuffer();
     CreateSyncObjects();
 }
@@ -710,6 +712,8 @@ void Application::CreateGraphicsPipeline()
     /* Pipeline */
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &m_DescriptorSetLayout;
     
     if(vkCreatePipelineLayout(m_Device, &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
         throw std::runtime_error("Failed to create pipeline layout.");
@@ -981,6 +985,60 @@ void Application::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 }
 
 
+void Application::CreateDescriptorSetLayout()
+{
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+
+    VkDescriptorSetLayoutCreateInfo descriptorSetInfo{};
+    descriptorSetInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetInfo.pBindings = &uboLayoutBinding;
+    descriptorSetInfo.bindingCount = 1;
+
+
+    if (vkCreateDescriptorSetLayout(m_Device, &descriptorSetInfo, nullptr, &m_DescriptorSetLayout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("Failed to create descriptor set");
+    }
+}
+
+void Application::CreateUniformBuffers()
+{
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+    m_UniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    m_UniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+    m_UniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        CreateBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            m_UniformBuffers[i], m_UniformBuffersMemory[i]);
+
+        vkMapMemory(m_Device, m_UniformBuffersMemory[i], 0, bufferSize, 0, &m_UniformBuffersMapped[i]);
+    }
+}
+
+void Application::UpdateUniformBuffer(uint32_t currentImage)
+{
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+    UniformBufferObject ubo{};
+    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.proj = glm::perspective(glm::radians(45.0f), m_SwapChainExtent.width / (float) m_SwapChainExtent.height, 0.1f, 10.0f);
+
+    ubo.proj[1][1] *= -1;
+    memcpy(m_UniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+}
+
 void Application::HandleEvents()
 {
 }
@@ -1009,6 +1067,8 @@ void Application::Render()
 
     vkResetCommandBuffer(m_CommandBuffers[m_CurrentFrame], 0);
     RecordCommandBuffer(m_CommandBuffers[m_CurrentFrame], imageIndex);
+
+    UpdateUniformBuffer(m_CurrentFrame);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1056,6 +1116,13 @@ void Application::Cleanup()
 {
     CleanupSwapChain();
 
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        vkDestroyBuffer(m_Device, m_UniformBuffers[i], nullptr);
+        vkFreeMemory(m_Device, m_UniformBuffersMemory[i], nullptr);
+    }
+    vkDestroyDescriptorSetLayout(m_Device, m_DescriptorSetLayout, nullptr);
 
     vkDestroyBuffer(m_Device, m_IndexBuffer, nullptr);
     vkFreeMemory(m_Device, m_IndexBufferMemory, nullptr);

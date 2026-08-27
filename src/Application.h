@@ -13,8 +13,11 @@
 #include <limits>
 #include <algorithm>
 #include <fstream>
+#include <chrono>
 
+#define GLM_FORCE_RADIANS
 #include <GLM/glm.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
 
 #include "Vertex.h"
 
@@ -31,6 +34,13 @@ struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR m_Capabilities;
     std::vector<VkSurfaceFormatKHR> m_Formats;
     std::vector<VkPresentModeKHR> m_PresentModes;
+};
+
+struct UniformBufferObject
+{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
 };
 
 class Application
@@ -101,6 +111,11 @@ private:
     void CreateBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
+    // Uniform Buffer Objects
+    void CreateDescriptorSetLayout();
+    void CreateUniformBuffers();
+    void UpdateUniformBuffer(uint32_t currentImage);
+
     void HandleEvents();
     void Update();
     void Render();
@@ -121,6 +136,7 @@ private:
     VkFormat m_SwapChainImageFormat;
     VkExtent2D m_SwapChainExtent;
     std::vector<VkImageView> m_SwapChainImageViews;
+    VkDescriptorSetLayout m_DescriptorSetLayout;
     VkPipelineLayout m_PipelineLayout;
     VkPipeline m_GraphicsPipeline;
     VkRenderPass m_RenderPass;
@@ -136,6 +152,9 @@ private:
     VkDeviceMemory m_VertexBufferMemory;
     VkBuffer m_IndexBuffer;
     VkDeviceMemory m_IndexBufferMemory;
+    std::vector<VkBuffer> m_UniformBuffers;
+    std::vector<VkDeviceMemory> m_UniformBuffersMemory;
+    std::vector<void*> m_UniformBuffersMapped;
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
