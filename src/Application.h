@@ -126,6 +126,8 @@ private:
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
     void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
     void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+    void CreateTextureImageView();
+    void CreateTextureSampler();
 
     void HandleEvents();
     void Update();
@@ -168,8 +170,12 @@ private:
     std::vector<void*> m_UniformBuffersMapped;
     VkDescriptorPool m_DescriptorPool;
     std::vector<VkDescriptorSet> m_DescriptorSets;    
+
     VkImage m_TextureImage;
     VkDeviceMemory m_TextureImageMemory;
+    VkImageView m_TextureImageView;
+    VkSampler m_TextureSampler;
+
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
