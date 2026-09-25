@@ -118,6 +118,15 @@ private:
     void CreateDescriptorPool();
     void CreateDescriptorSets();
 
+    // Texture's
+    void CreateTextureImage();
+    void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, 
+        VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    VkCommandBuffer BeginSingleTimeCommands();
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
+    void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void CopyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
     void HandleEvents();
     void Update();
     void Render();
@@ -158,7 +167,9 @@ private:
     std::vector<VkDeviceMemory> m_UniformBuffersMemory;
     std::vector<void*> m_UniformBuffersMapped;
     VkDescriptorPool m_DescriptorPool;
-    std::vector<VkDescriptorSet> m_DescriptorSets;
+    std::vector<VkDescriptorSet> m_DescriptorSets;    
+    VkImage m_TextureImage;
+    VkDeviceMemory m_TextureImageMemory;
 
     // Handle validation layers
     const std::vector<const char*> m_ValidationLayers = {
